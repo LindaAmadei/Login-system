@@ -1,7 +1,11 @@
 package co.example.LoginDemo.user.entities;
 
+import javax.management.relation.Role;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @Table
@@ -24,6 +28,16 @@ public class User {
 
     private String password;
     private LocalDateTime jwtCreatedOn;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "USER_ROLES",
+    joinColumns = {
+            @JoinColumn(name = "USER_ID")
+    },
+            inverseJoinColumns = {
+            @JoinColumn(name = "ROLE_ID")})
+    private Set<Role> roles;
+
 
     public User() {
     }
@@ -112,5 +126,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setRoles(Set<Role> roles) {
+    }
+
+
+    public Optional<Object> getRoles() {
+        return null;
     }
 }

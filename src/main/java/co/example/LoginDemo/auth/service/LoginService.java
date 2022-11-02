@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Service
 public class LoginService {
@@ -50,9 +52,21 @@ public class LoginService {
     public boolean canUserLogin(User user, String password) {
         return passwordEncoder.matches(password, user.getPassword());
     }
+
+    static Date convertToDateViaInstant(LocalDateTime dateToConvert){
+        return java.util.Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
+    }
     public  static String getJWT(User user){
-        JWT.create().withClaim("id", user.getId()).withClaim("email", user.getEmail()).sign(Algorithm.HMAC512(JWT_SECRET));
-        return null;
+        Date expiresAt = convertToDateViaInstant(LocalDateTime.now().plusDays(15));
+        String[] roles = user.getRoles().stream().map(role -> role.getName()).toArray(String[]::new);
+
+        return JWT.create()
+                .withIssuer("demo")
+                .withIssuedAt(new Date())
+                .withExpiresAt(expiresAt)
+                .withClaim("roles", String.join(",",roles))
+                .withClaim("id", user.getId())
+                .sign(Algorithm.HMAC512(JWT_SECRET));;
     }
 
     public  String generateJwt(User user){

@@ -1,8 +1,10 @@
-package co.example.LoginDemo.user.entities;
+package co.example.LoginDemo.utilis.entities;
 
+import co.example.LoginDemo.user.entities.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,10 +17,13 @@ import javax.servlet.Filter;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+   prePostEnabled = true,
+   securedEnabled = true,
+   jsr250Enabled = true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
-
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -27,9 +32,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers().authenticated();
+                .antMatchers("/admin/**").hasAnyRole("ROLE_" + Roles.ADMIN)
+                .antMatchers("/app/**").hasAnyRole("ROLE_" + Roles.REGISTERED)
+                .anyRequest().authenticated();
 
         http.csrf().disable();
         http.headers().frameOptions().disable();

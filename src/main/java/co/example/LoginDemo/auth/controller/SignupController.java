@@ -3,6 +3,7 @@ package co.example.LoginDemo.auth.controller;
 import co.example.LoginDemo.auth.entities.SignupActivationDTO;
 import co.example.LoginDemo.auth.entities.SignupDTO;
 import co.example.LoginDemo.auth.service.SignupService;
+import co.example.LoginDemo.user.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,13 +18,13 @@ public class SignupController {
     private SignupService signupService;
 
     @PostMapping("/signup")
-    public void signup (@RequestBody SignupDTO signupDTO){
-        signupService.signup(signupDTO);
-
+    public User signup (@RequestBody SignupDTO signupDTO) throws Exception{
+        return signupService.signup(signupDTO);
     }
 
     @PostMapping("/signup/activation")
-    public void signup (@RequestBody SignupActivationDTO signupActivationDTO) throws Exception{
-        signupService.activate(signupActivationDTO);
+    public User signup (@RequestBody SignupActivationDTO signupActivationDTO) throws Exception{
+        return signupService.activate(signupActivationDTO);
+
     }
 }
